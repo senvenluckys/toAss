@@ -67,12 +67,50 @@ jobs:
         pip install PyQt5==5.15.10 pysubs2==1.8.0 requests==2.31.0 pyinstaller==6.3.0
     - name: Build executable
       run: |
-        pyinstaller --onefile --noconsole --name "SRT-to-ASS-Converter" toAss.py
+        pyinstaller --onedir --noconsole --name "SRT-to-ASS-Converter" toAss.py
+        # Create .app bundle
+        mkdir -p "dist/SRT-to-ASS-Converter.app/Contents/MacOS"
+        mkdir -p "dist/SRT-to-ASS-Converter.app/Contents/Resources"
+
+        # Copy the executable
+        cp -r "dist/SRT-to-ASS-Converter/"* "dist/SRT-to-ASS-Converter.app/Contents/MacOS/"
+
+        # Create Info.plist
+        cat > "dist/SRT-to-ASS-Converter.app/Contents/Info.plist" << EOF
+        <?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+        <plist version="1.0">
+        <dict>
+            <key>CFBundleExecutable</key>
+            <string>SRT-to-ASS-Converter</string>
+            <key>CFBundleIdentifier</key>
+            <string>com.senvenluckys.srt-to-ass-converter</string>
+            <key>CFBundleName</key>
+            <string>SRT to ASS Converter</string>
+            <key>CFBundleVersion</key>
+            <string>1.0.8</string>
+            <key>CFBundleShortVersionString</key>
+            <string>1.0.8</string>
+            <key>CFBundleInfoDictionaryVersion</key>
+            <string>6.0</string>
+            <key>CFBundlePackageType</key>
+            <string>APPL</string>
+            <key>NSHighResolutionCapable</key>
+            <true/>
+            <key>LSMinimumSystemVersion</key>
+            <string>10.13.0</string>
+        </dict>
+        </plist>
+        EOF
+
+        # Create a zip file for easier distribution
+        cd dist && zip -r "SRT-to-ASS-Converter-macOS.zip" "SRT-to-ASS-Converter.app"
+
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
         name: macos-executable
-        path: dist/SRT-to-ASS-Converter
+        path: dist/SRT-to-ASS-Converter-macOS.zip
 
 # Linux构建暂时跳过，避免依赖问题
   # build-linux:
@@ -138,8 +176,8 @@ jobs:
           - 现代化的用户界面
 
           ### 下载说明
-          - Windows: 下载 `SRT-to-ASS-Converter.exe`
-          - macOS: 下载 `SRT-to-ASS-Converter`
+          - Windows: 下载 `SRT-to-ASS-Converter.exe`，双击运行
+          - macOS: 下载 `SRT-to-ASS-Converter-macOS.zip`，解压后双击 `.app` 文件运行
           - Linux: 请从源码运行 `python toAss.py`
 
           ### Linux用户安装说明
