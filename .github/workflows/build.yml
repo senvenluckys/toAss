@@ -31,7 +31,7 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
 
@@ -80,7 +80,7 @@ jobs:
         xvfb-run -a pyinstaller --onefile --name "SRT转ASS字幕转换器" toAss.py
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.artifact-name }}
         path: dist/${{ matrix.executable-name }}
@@ -94,21 +94,21 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Download all artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
+      with:
+        path: artifacts
 
     - name: List downloaded files
       run: |
         echo "Downloaded artifacts:"
-        find . -name "*" -type f
+        find artifacts -name "*" -type f
 
     - name: Create Release
       id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: softprops/action-gh-release@v2
       with:
         tag_name: ${{ github.ref_name }}
-        release_name: Release ${{ github.ref_name }}
+        name: Release ${{ github.ref_name }}
         draft: false
         prerelease: false
         body: |
@@ -127,33 +127,8 @@ jobs:
           - Windows: 下载 `SRT转ASS字幕转换器-windows.exe`
           - macOS: 下载 `SRT转ASS字幕转换器-macos`
           - Linux: 下载 `SRT转ASS字幕转换器-linux`
+        files: |
+          artifacts/windows-executable/SRT转ASS字幕转换器.exe
+          artifacts/macos-executable/SRT转ASS字幕转换器
+          artifacts/linux-executable/SRT转ASS字幕转换器
 
-    - name: Upload Windows Release Asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./windows-executable/SRT转ASS字幕转换器.exe
-        asset_name: SRT转ASS字幕转换器-windows.exe
-        asset_content_type: application/octet-stream
-
-    - name: Upload macOS Release Asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./macos-executable/SRT转ASS字幕转换器
-        asset_name: SRT转ASS字幕转换器-macos
-        asset_content_type: application/octet-stream
-
-    - name: Upload Linux Release Asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./linux-executable/SRT转ASS字幕转换器
-        asset_name: SRT转ASS字幕转换器-linux
-        asset_content_type: application/octet-stream
