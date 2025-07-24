@@ -262,17 +262,20 @@ class MainInterface(ScrollArea):
         file_buttons_layout = QHBoxLayout()
 
         add_files_btn = PushButton("添加文件")
-        add_files_btn.setIcon(FIF.ADD)
+        if QFLUENTWIDGETS_AVAILABLE and FIF.ADD:
+            add_files_btn.setIcon(FIF.ADD)
         add_files_btn.clicked.connect(self.add_files)
         file_buttons_layout.addWidget(add_files_btn)
 
         remove_files_btn = PushButton("删除选中")
-        remove_files_btn.setIcon(FIF.DELETE)
+        if QFLUENTWIDGETS_AVAILABLE and FIF.DELETE:
+            remove_files_btn.setIcon(FIF.DELETE)
         remove_files_btn.clicked.connect(self.remove_selected_files)
         file_buttons_layout.addWidget(remove_files_btn)
 
         clear_files_btn = PushButton("清除全部")
-        clear_files_btn.setIcon(FIF.CANCEL)
+        if QFLUENTWIDGETS_AVAILABLE and FIF.CANCEL:
+            clear_files_btn.setIcon(FIF.CANCEL)
         clear_files_btn.clicked.connect(self.clear_all_files)
         file_buttons_layout.addWidget(clear_files_btn)
 
@@ -300,17 +303,20 @@ class MainInterface(ScrollArea):
         subtitle_buttons_layout = QHBoxLayout()
 
         add_config_btn = PushButton("添加")
-        add_config_btn.setIcon(FIF.ADD)
+        if QFLUENTWIDGETS_AVAILABLE and FIF.ADD:
+            add_config_btn.setIcon(FIF.ADD)
         add_config_btn.clicked.connect(self.add_subtitle_config)
         subtitle_buttons_layout.addWidget(add_config_btn)
 
         edit_config_btn = PushButton("编辑")
-        edit_config_btn.setIcon(FIF.EDIT)
+        if QFLUENTWIDGETS_AVAILABLE and FIF.EDIT:
+            edit_config_btn.setIcon(FIF.EDIT)
         edit_config_btn.clicked.connect(self.edit_subtitle_config)
         subtitle_buttons_layout.addWidget(edit_config_btn)
 
         delete_config_btn = PushButton("删除")
-        delete_config_btn.setIcon(FIF.DELETE)
+        if QFLUENTWIDGETS_AVAILABLE and FIF.DELETE:
+            delete_config_btn.setIcon(FIF.DELETE)
         delete_config_btn.clicked.connect(self.delete_subtitle_config)
         subtitle_buttons_layout.addWidget(delete_config_btn)
 
@@ -346,7 +352,8 @@ class MainInterface(ScrollArea):
         convert_layout.addStretch()
 
         self.convert_button = PushButton("开始转换")
-        self.convert_button.setIcon(FIF.SYNC)
+        if QFLUENTWIDGETS_AVAILABLE and FIF.SYNC:
+            self.convert_button.setIcon(FIF.SYNC)
         self.convert_button.clicked.connect(self.start_convert)
         self.convert_button.setMinimumSize(120, 40)
         convert_layout.addWidget(self.convert_button)
