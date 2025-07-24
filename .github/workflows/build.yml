@@ -42,12 +42,12 @@ jobs:
         pip install PyQt5==5.15.10 pysubs2==1.8.0 requests==2.31.0 pyinstaller==6.3.0
     - name: Build executable
       run: |
-        pyinstaller --onefile --noconsole --name "SRT转ASS字幕转换器" toAss.py
+        pyinstaller --onefile --noconsole --name "SRT-to-ASS-Converter" toAss.py
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
         name: windows-executable
-        path: dist/SRT转ASS字幕转换器.exe
+        path: dist/SRT-to-ASS-Converter.exe
 
   build-macos:
     needs: test
@@ -67,12 +67,12 @@ jobs:
         pip install PyQt5==5.15.10 pysubs2==1.8.0 requests==2.31.0 pyinstaller==6.3.0
     - name: Build executable
       run: |
-        pyinstaller --onefile --noconsole --name "SRT转ASS字幕转换器" toAss.py
+        pyinstaller --onefile --noconsole --name "SRT-to-ASS-Converter" toAss.py
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
         name: macos-executable
-        path: dist/SRT转ASS字幕转换器
+        path: dist/SRT-to-ASS-Converter
 
 # Linux构建暂时跳过，避免依赖问题
   # build-linux:
@@ -138,8 +138,8 @@ jobs:
           - 现代化的用户界面
 
           ### 下载说明
-          - Windows: 下载 `SRT转ASS字幕转换器.exe`
-          - macOS: 下载 `SRT转ASS字幕转换器`
+          - Windows: 下载 `SRT-to-ASS-Converter.exe`
+          - macOS: 下载 `SRT-to-ASS-Converter`
           - Linux: 请从源码运行 `python toAss.py`
 
           ### Linux用户安装说明
