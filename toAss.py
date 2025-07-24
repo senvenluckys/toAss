@@ -17,9 +17,40 @@ from PyQt5.QtWidgets import (QApplication, QWidget, QVBoxLayout, QHBoxLayout,
                              QFontDialog)
 from PyQt5.QtCore import Qt, QRunnable, QThreadPool, pyqtSignal, QObject, QTranslator, QLibraryInfo, QTime
 from PyQt5.QtGui import QFont, QIcon
-from qfluentwidgets import (PushButton, Theme, setTheme, InfoBar, InfoBarPosition, FluentIcon as FIF,
-                           CardWidget, BodyLabel, SubtitleLabel, TitleLabel,
-                           ScrollArea, VBoxLayout, MSFluentWindow)
+# Try to import qfluentwidgets, fallback to standard PyQt5 if not available
+try:
+    from qfluentwidgets import (PushButton, Theme, setTheme, InfoBar, InfoBarPosition, FluentIcon as FIF,
+                               CardWidget, BodyLabel, SubtitleLabel, TitleLabel,
+                               ScrollArea, VBoxLayout, MSFluentWindow)
+    QFLUENTWIDGETS_AVAILABLE = True
+except ImportError:
+    # Fallback to standard PyQt5 widgets
+    from PyQt5.QtWidgets import QPushButton as PushButton, QWidget as CardWidget, QLabel as BodyLabel
+    from PyQt5.QtWidgets import QLabel as SubtitleLabel, QLabel as TitleLabel, QScrollArea as ScrollArea
+    from PyQt5.QtWidgets import QVBoxLayout as VBoxLayout, QMainWindow as MSFluentWindow
+    QFLUENTWIDGETS_AVAILABLE = False
+
+    # Create dummy classes/functions for missing qfluentwidgets features
+    class Theme:
+        DARK = "dark"
+        LIGHT = "light"
+
+    def setTheme(theme):
+        pass
+
+    class InfoBar:
+        @staticmethod
+        def success(title, content, duration, parent):
+            pass
+        @staticmethod
+        def error(title, content, duration, parent):
+            pass
+
+    class InfoBarPosition:
+        TOP_RIGHT = "top_right"
+
+    class FIF:
+        FOLDER = None
 
 CONFIG_FILE = 'sub.json'
 SETTINGS_FILE = 'settings.json'
@@ -1444,7 +1475,8 @@ class SrtToAssConverter(MSFluentWindow):
 if __name__ == '__main__':
     try:
         # 设置环境变量，减少警告信息
-        os.environ['QFLUENTWIDGETS_NO_TIPS'] = 'True'
+        if QFLUENTWIDGETS_AVAILABLE:
+            os.environ['QFLUENTWIDGETS_NO_TIPS'] = 'True'
         os.environ['QT_LOGGING_RULES'] = 'qt.qpa.fonts.warning=false'
 
         # macOS 特定优化
