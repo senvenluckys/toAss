@@ -91,6 +91,37 @@ python deploy.py
 
 如果在某些环境中无法安装`qfluentwidgets`，程序会自动回退到标准PyQt5界面。
 
+### macOS安全问题
+
+如果在macOS上遇到"应用程序已损坏"的提示，请使用以下方法解决：
+
+**方法1：使用修复脚本**
+```bash
+# 下载修复脚本
+curl -O https://raw.githubusercontent.com/senvenluckys/toAss/main/fix-macos-security.sh
+chmod +x fix-macos-security.sh
+
+# 运行修复脚本
+./fix-macos-security.sh ~/Downloads/SRT-to-ASS-Converter
+```
+
+**方法2：手动修复**
+```bash
+# 移除隔离属性
+xattr -d com.apple.quarantine /path/to/SRT-to-ASS-Converter
+
+# 添加执行权限
+chmod +x /path/to/SRT-to-ASS-Converter
+
+# 运行
+./SRT-to-ASS-Converter
+```
+
+**方法3：系统设置**
+1. 尝试运行应用，会弹出安全提示
+2. 打开 系统设置 > 隐私与安全性
+3. 点击"仍要打开"
+
 ## 🛠️ 开发环境设置
 
 ### 安装开发依赖

@@ -103,6 +103,9 @@ jobs:
         </plist>
         EOF
 
+        # Remove quarantine attributes to avoid "damaged" warnings
+        xattr -cr "dist/SRT-to-ASS-Converter.app"
+
         # Create a zip file for easier distribution
         cd dist && zip -r "SRT-to-ASS-Converter-macOS.zip" "SRT-to-ASS-Converter.app"
 
