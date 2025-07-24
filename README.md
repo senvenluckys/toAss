@@ -47,7 +47,11 @@
 
 3. **或手动安装依赖**
    ```bash
+   # 基础依赖（必需）
    pip install -r requirements.txt
+
+   # 完整依赖（包含现代化UI，可选）
+   pip install -r requirements-full.txt
    ```
 
 4. **运行程序**
@@ -77,6 +81,15 @@ python deploy.py
 - **操作系统**: Windows 10+, macOS 10.13+, Ubuntu 18.04+
 - **内存**: 至少 512MB RAM
 - **存储**: 至少 100MB 可用空间
+
+### 依赖说明
+
+项目支持两种安装模式：
+
+- **基础模式** (`requirements.txt`): 使用标准PyQt5界面，兼容性最好
+- **完整模式** (`requirements-full.txt`): 包含现代化UI组件，界面更美观
+
+如果在某些环境中无法安装`qfluentwidgets`，程序会自动回退到标准PyQt5界面。
 
 ## 🛠️ 开发环境设置
 
