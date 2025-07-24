@@ -14,7 +14,7 @@ from PyQt5.QtWidgets import (QApplication, QWidget, QVBoxLayout, QHBoxLayout,
                              QListWidget, QListWidgetItem, QCheckBox, QLabel,
                              QDialog, QFormLayout, QLineEdit, QTimeEdit, QTextEdit, QDialogButtonBox,
                              QFileDialog, QColorDialog, QAbstractItemView, QSystemTrayIcon, QMenu, QMessageBox,
-                             QFontDialog)
+                             QFontDialog, QStackedWidget)
 from PyQt5.QtCore import Qt, QRunnable, QThreadPool, pyqtSignal, QObject, QTranslator, QLibraryInfo, QTime
 from PyQt5.QtGui import QFont, QIcon
 # Try to import qfluentwidgets, fallback to standard PyQt5 if not available
@@ -50,7 +50,15 @@ except ImportError:
         TOP_RIGHT = "top_right"
 
     class FIF:
+        # 定义所有需要的图标属性为None（在标准PyQt5中不显示图标）
         FOLDER = None
+        ADD = None
+        DELETE = None
+        CANCEL = None
+        EDIT = None
+        SYNC = None
+        HOME = None
+        SETTING = None
 
 CONFIG_FILE = 'sub.json'
 SETTINGS_FILE = 'settings.json'
@@ -1085,9 +1093,23 @@ class SrtToAssConverter(MSFluentWindow):
         # 初始化字体设置
         self.font_family = "方正粗圆_GBK"
         self.font_size = 70
+
+        # 如果没有qfluentwidgets，添加fallback组件
+        if not QFLUENTWIDGETS_AVAILABLE:
+            self.stackedWidget = QStackedWidget()
+            self.setCentralWidget(self.stackedWidget)
+
         self.initUI()
         self.load_settings()  # 在UI初始化后加载设置
         self.init_tray()
+
+    def addSubInterface(self, widget, icon, text):
+        """为标准QMainWindow提供的fallback方法"""
+        if not QFLUENTWIDGETS_AVAILABLE:
+            self.stackedWidget.addWidget(widget)
+        else:
+            # 如果有qfluentwidgets，调用原始方法
+            super().addSubInterface(widget, icon, text)
 
     def initUI(self):
         """初始化现代化用户界面"""
