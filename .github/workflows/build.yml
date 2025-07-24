@@ -1,0 +1,159 @@
+name: Build and Release
+
+on:
+  push:
+    branches: [ main, master ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            python-version: '3.11'
+            artifact-name: 'windows-executable'
+            executable-name: 'SRT转ASS字幕转换器.exe'
+          - os: macos-latest
+            python-version: '3.11'
+            artifact-name: 'macos-executable'
+            executable-name: 'SRT转ASS字幕转换器'
+          - os: ubuntu-latest
+            python-version: '3.11'
+            artifact-name: 'linux-executable'
+            executable-name: 'SRT转ASS字幕转换器'
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install system dependencies (Ubuntu)
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          libgl1-mesa-glx \
+          libglib2.0-0 \
+          libxkbcommon-x11-0 \
+          libxcb-icccm4 \
+          libxcb-image0 \
+          libxcb-keysyms1 \
+          libxcb-randr0 \
+          libxcb-render-util0 \
+          libxcb-xinerama0 \
+          libxcb-xfixes0 \
+          xvfb
+
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Test import
+      run: |
+        python -c "import sys; print('Python version:', sys.version)"
+        python -c "import PyQt5; print('PyQt5 imported successfully')" || echo "PyQt5 import failed"
+        python -c "import pysubs2; print('pysubs2 imported successfully')" || echo "pysubs2 import failed"
+        python -c "import requests; print('requests imported successfully')" || echo "requests import failed"
+
+    - name: Build with PyInstaller (Windows)
+      if: runner.os == 'Windows'
+      run: |
+        pyinstaller --onefile --windowed --name "SRT转ASS字幕转换器" toAss.py
+
+    - name: Build with PyInstaller (macOS)
+      if: runner.os == 'macOS'
+      run: |
+        pyinstaller --onefile --windowed --name "SRT转ASS字幕转换器" toAss.py
+
+    - name: Build with PyInstaller (Linux)
+      if: runner.os == 'Linux'
+      run: |
+        xvfb-run -a pyinstaller --onefile --name "SRT转ASS字幕转换器" toAss.py
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ matrix.artifact-name }}
+        path: dist/${{ matrix.executable-name }}
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Download all artifacts
+      uses: actions/download-artifact@v3
+
+    - name: List downloaded files
+      run: |
+        echo "Downloaded artifacts:"
+        find . -name "*" -type f
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref_name }}
+        release_name: Release ${{ github.ref_name }}
+        draft: false
+        prerelease: false
+        body: |
+          ## 字幕格式转换器 ${{ github.ref_name }}
+
+          ### 功能特性
+          - 支持 SRT → ASS 转换
+          - 支持 VTT → ASS 转换
+          - 支持 ASS → ASS 样式修改
+          - 支持繁体中文转换
+          - 支持自定义字幕样式和颜色
+          - 支持批量文件处理
+          - 现代化的用户界面
+
+          ### 下载说明
+          - Windows: 下载 `SRT转ASS字幕转换器-windows.exe`
+          - macOS: 下载 `SRT转ASS字幕转换器-macos`
+          - Linux: 下载 `SRT转ASS字幕转换器-linux`
+
+    - name: Upload Windows Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./windows-executable/SRT转ASS字幕转换器.exe
+        asset_name: SRT转ASS字幕转换器-windows.exe
+        asset_content_type: application/octet-stream
+
+    - name: Upload macOS Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./macos-executable/SRT转ASS字幕转换器
+        asset_name: SRT转ASS字幕转换器-macos
+        asset_content_type: application/octet-stream
+
+    - name: Upload Linux Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./linux-executable/SRT转ASS字幕转换器
+        asset_name: SRT转ASS字幕转换器-linux
+        asset_content_type: application/octet-stream
